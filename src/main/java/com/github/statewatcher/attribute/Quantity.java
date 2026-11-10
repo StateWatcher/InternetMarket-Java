@@ -26,7 +26,7 @@ public class Quantity {
 
     private static int validate(int value) {
         if (value < 0) {
-            throw new IllegalArgumentException("Quantity must be non-negative:" + value);
+            throw new IllegalArgumentException("Quantity must be non-negative: " + value);
         }
         return value;
     }

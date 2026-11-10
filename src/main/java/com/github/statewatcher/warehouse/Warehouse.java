@@ -30,6 +30,10 @@ public class Warehouse implements Iterable<Product> {
         }
     }
 
+    public int getMaxSize() {
+        return this.maxSize;
+    }
+
     public boolean isFull() {
         return this.products.size() >= this.maxSize;
     }
@@ -102,15 +106,23 @@ public class Warehouse implements Iterable<Product> {
         return result;
     }
 
+    public static Warehouse moveFrom(Warehouse source) {
+        Warehouse result = new Warehouse(source.maxSize);
+        result.transferFrom(source);
+        return result;
+    }
+
     public void transferFrom(Warehouse other) {
         if (this == other) {
             return;
+        }
+        if (other.products.size() > this.maxSize) {
+            throw new IllegalStateException("Source has " + other.products.size() + " products, but target max size is: " + this.maxSize);
         }
         for (Product product : this.products) {
             product.setWarehouse(null);
         }
         this.products = other.products;
-        this.maxSize = other.maxSize;
         other.products = new ArrayList<>();
         for (Product product : this.products) {
             product.setWarehouse(this);

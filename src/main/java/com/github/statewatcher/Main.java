@@ -12,6 +12,7 @@ public class Main {
         testAddAndIterator();
         testCopy();
         testTransferFrom();
+        testMove();
         testSearchAndRemove();
         testProduct();
     }
@@ -27,8 +28,7 @@ public class Main {
         for (String key : keys) {
             last = DemoData.create(key);
             warehouse.addProduct(last);
-            System.out.println("addProduct(" + key + "), товар привязан к складу: "
-                    + (last.getWarehouse() == warehouse));
+            System.out.println("addProduct(" + key + "), товар привязан к складу: " + (last.getWarehouse() == warehouse));
         }
         System.out.println("Склад после добавления:");
         ConsolePrinter.printWarehouse(warehouse);
@@ -100,15 +100,50 @@ public class Main {
         ConsolePrinter.printWarehouse(target);
         System.out.println("jacket.getWarehouse() == target: " + (jacket.getWarehouse() == target));
         System.out.println("bread.getWarehouse() == null: " + (bread.getWarehouse() == null));
+        System.out.println("лимит target не изменился: " + target.getMaxSize());
 
         source.addProduct(DemoData.create("milk"));
         System.out.println("source после addProduct(milk):");
         ConsolePrinter.printWarehouse(source);
+
+        Warehouse small = new Warehouse(1);
+        Product phone = DemoData.create("phone");
+        small.addProduct(phone);
+        try {
+            small.transferFrom(target);
+        } catch (IllegalStateException e) {
+            System.out.println("small.transferFrom(target) -> " + e.getMessage());
+        }
+        System.out.println("small не изменился:");
+        ConsolePrinter.printWarehouse(small);
+        System.out.println("target не изменился:");
+        ConsolePrinter.printWarehouse(target);
+        System.out.println("phone.getWarehouse() == small: " + (phone.getWarehouse() == small));
+    }
+
+    private static void testMove() {
+        System.out.println();
+        System.out.println("4. Перемещение склада (moveFrom)");
+        Warehouse source = new Warehouse(3);
+        Product laptop = DemoData.create("laptop");
+        source.addProduct(laptop);
+        source.addProduct(DemoData.create("bread"));
+        System.out.println("source, лимит " + source.getMaxSize() + ":");
+        ConsolePrinter.printWarehouse(source);
+
+        Warehouse moved = Warehouse.moveFrom(source);
+
+        System.out.println("moved, лимит " + moved.getMaxSize() + ":");
+        ConsolePrinter.printWarehouse(moved);
+        System.out.println("source после перемещения:");
+        ConsolePrinter.printWarehouse(source);
+        System.out.println("laptop.getWarehouse() == moved: " + (laptop.getWarehouse() == moved));
+        System.out.println("тот же объект, а не копия: " + (moved.findById(laptop.getId()).orElse(null) == laptop));
     }
 
     private static void testSearchAndRemove() {
         System.out.println();
-        System.out.println("4. Поиск и удаление");
+        System.out.println("5. Поиск и удаление");
         Warehouse warehouse = new Warehouse(10);
         Product phone = DemoData.create("phone");
         Product milk = DemoData.create("milk");
@@ -143,7 +178,7 @@ public class Main {
 
     private static void testProduct() {
         System.out.println();
-        System.out.println("5. Методы товара");
+        System.out.println("6. Методы товара");
         Warehouse moscow = new Warehouse(5);
         Warehouse kazan = new Warehouse(1);
         Product phone = DemoData.create("phone");
